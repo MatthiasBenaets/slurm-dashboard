@@ -14,7 +14,7 @@ func LDAPAuthenticate(username, password string) error {
 	adBindUser := os.Getenv("LDAP_BIND_USER")
 	adBindPassword := os.Getenv("LDAP_BIND_PASSWORD")
 
-	conn, err := ldap.DialURL(ldapServer)
+	conn, err := ldap.DialURL("ldap://" + ldapServer)
 	if err != nil {
 		log.Printf("LDAP DialURL error: %v", err)
 		return err
