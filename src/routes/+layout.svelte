@@ -9,4 +9,12 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-{@render children?.()}
+<div class="min-w-sm text-neutral-200">
+	{@render children?.()}
+</div>
+
+<style>
+	:global(html) {
+		background-color: oklch(14.5% 0 0);
+	}
+</style>
