@@ -1,14 +1,15 @@
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
 import { fetchSlurmData } from '$lib/api';
-import type { PageServerLoad } from '../$types';
 
-// initial cluster data
-export const load: PageServerLoad = async () => {
+// used for auto-refresh cluster data on dashboard
+export const GET: RequestHandler = async () => {
 	const partitions = await fetchSlurmData('slurm/partitions/');
 	const nodes = await fetchSlurmData('slurm/nodes');
 	const sjobs = await fetchSlurmData('slurm/jobs');
 	const dbjobs = await fetchSlurmData('slurmdb/jobs/');
 
-	return {
+	const data = {
 		slurm: {
 			partitions: partitions.data,
 			partitionsError: partitions.error,
@@ -20,4 +21,6 @@ export const load: PageServerLoad = async () => {
 			dbjobsError: dbjobs.error
 		}
 	};
+
+	return json(data);
 };

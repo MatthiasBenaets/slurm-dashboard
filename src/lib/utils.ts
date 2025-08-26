@@ -26,3 +26,23 @@ export function setAuthCookie(cookies: Cookies, res: Response) {
 		cookies.set(name, value, opts);
 	}
 }
+
+// convert Trackable Resources from string to object
+export function convertTres(str: string) {
+	if (!str)
+		return {
+			mem: 0,
+			cpu: 0
+		};
+	const result: Record<string, number> = {};
+	const pairs = str.split(',');
+	for (const pair of pairs) {
+		const [key, value] = pair.split('=');
+		if (key == 'mem') {
+			result[key] = Number((parseInt(value) / 1000).toFixed(0));
+		} else {
+			result[key] = parseInt(value);
+		}
+	}
+	return result;
+}
