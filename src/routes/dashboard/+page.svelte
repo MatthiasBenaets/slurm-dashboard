@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { Nodes, Jobs, History, Menu, Summary } from '$lib/components/dashboard';
+	import { goto } from '$app/navigation';
 	import { LogOut } from '@lucide/svelte';
+	import { Nodes, Jobs, History, Menu, Summary } from '$lib/components/dashboard';
 	import { pastTime, currentTime } from '$lib/utils';
 	import type { Node, Partition } from '$lib/types';
 
@@ -37,6 +38,10 @@
 					end_time: range_end
 				})
 			});
+			if (!res.ok) {
+				goto('/');
+			}
+
 			const updatedData = await res.json();
 			if (updatedData.slurm) {
 				slurm = updatedData.slurm;
@@ -45,6 +50,7 @@
 				jobsPage = Math.ceil(slurm.sjobs.jobs.length / jobsPerPage);
 			}
 		} catch (e) {
+			goto('/');
 			error = (e as Error).message;
 		}
 	}

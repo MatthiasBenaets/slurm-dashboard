@@ -1,5 +1,6 @@
-import { redirect } from '@sveltejs/kit';
-import { setAuthCookie } from '$lib/utils';
+// import { redirect } from '@sveltejs/kit';
+// import { setAuthCookie } from '$lib/utils';
+import { fetchAuthToken } from '$lib/api';
 import type { Actions } from './$types';
 
 export const actions = {
@@ -15,25 +16,6 @@ export const actions = {
 		}
 
 		// Authenticate using Go backend API
-		const res = await fetch('http://localhost:8080/api/login', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded'
-			},
-			body: new URLSearchParams({
-				username: username as string,
-				password: password as string
-			}),
-			credentials: 'include'
-		});
-
-		if (res.ok) {
-			setAuthCookie(cookies, res);
-			return redirect(303, '/dashboard');
-		} else {
-			return {
-				error: 'Invalid login'
-			};
-		}
+		return await fetchAuthToken(cookies, username as string, password as string);
 	}
 } satisfies Actions;

@@ -15,6 +15,7 @@ func main() {
 	http.HandleFunc("/api/login", handlers.LoginHandler)
 	http.HandleFunc("/api/logout", handlers.LogoutHandler)
 	http.HandleFunc("/api/protected", handlers.ProtectedHandler)
+	http.HandleFunc("/api/refresh", handlers.RefreshHandler)
 	http.HandleFunc("/api/slurm/", handlers.SlurmHandler)
 	http.HandleFunc("/api/slurmdb/", handlers.SlurmHandler)
 

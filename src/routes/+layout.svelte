@@ -3,6 +3,18 @@
 	import favicon from '$lib/assets/favicon.svg';
 
 	let { children } = $props();
+
+	// refresh auth cookie every 30 minutes when active
+	$effect(() => {
+		const interval = setInterval(
+			async () => {
+				await fetch('/api/refresh', { method: 'POST' });
+			},
+			30 * 60 * 1000
+		);
+
+		return () => clearInterval(interval);
+	});
 </script>
 
 <svelte:head>

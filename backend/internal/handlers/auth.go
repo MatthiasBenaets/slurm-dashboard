@@ -31,7 +31,7 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func ProtectedHandler(w http.ResponseWriter, r *http.Request) {
-	// validate token
+	// validate existing token
 	claims, err := auth.ValidateToken(r)
 	if err != nil {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
@@ -43,4 +43,16 @@ func ProtectedHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+}
+
+func RefreshHandler(w http.ResponseWriter, r *http.Request) {
+	// validate existing token
+	claims, err := auth.ValidateToken(r)
+	if err != nil {
+		http.Error(w, "Invalid or expired token", http.StatusUnauthorized)
+		return
+	}
+
+	// issue new token with extended expiration
+	auth.Authenticate(w, claims.Username)
 }
