@@ -3,10 +3,10 @@
 	import CaretLeft from 'phosphor-svelte/lib/CaretLeft';
 	import CaretRight from 'phosphor-svelte/lib/CaretRight';
 
-	let { count, perPage, page = $bindable() } = $props();
+	let { count, jobsPerPage, page = $bindable() } = $props();
 </script>
 
-<Pagination.Root {count} {perPage} bind:page>
+<Pagination.Root {count} perPage={jobsPerPage} bind:page>
 	{#snippet children({ pages, range })}
 		<div class="mt-4 flex items-center justify-center">
 			<Pagination.PrevButton

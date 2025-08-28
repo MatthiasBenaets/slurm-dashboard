@@ -69,7 +69,7 @@
 	class="flex w-full max-w-[340px] flex-col gap-1.5"
 >
 	<button
-		class="flex h-10 w-full cursor-pointer items-center justify-between rounded-md border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm tracking-[0.01em] text-neutral-200 select-none focus-within:border-neutral-500 focus-within:shadow-sm hover:border-neutral-500"
+		class="flex h-7 w-full cursor-pointer items-center justify-between rounded-md border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm tracking-[0.01em] text-neutral-200 select-none focus-within:border-neutral-500 focus-within:shadow-sm hover:border-neutral-500"
 		onclick={() => (open = true)}
 		tabindex="0"
 	>
