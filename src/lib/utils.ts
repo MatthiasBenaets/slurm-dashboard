@@ -1,6 +1,9 @@
 import type { Cookies } from '@sveltejs/kit';
 import type { CookieSerializeOptions } from 'cookie';
 
+export const pastTime: number = new Date().getTime() / 1000 - 60 * 60 * 24 * 7;
+export const currentTime: number = new Date().getTime() / 1000;
+
 // get auth cookie from response header and transfer it into a cookie
 export function setAuthCookie(cookies: Cookies, res: Response) {
 	const cookie = res.headers.get('set-cookie');

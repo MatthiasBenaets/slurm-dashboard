@@ -35,6 +35,8 @@
 		"vite": "^7.0.4"
 	},
 	"dependencies": {
-		"@lucide/svelte": "^0.542.0"
+		"@lucide/svelte": "^0.542.0",
+		"bits-ui": "^2.9.4",
+		"phosphor-svelte": "^3.0.1"
 	}
 }

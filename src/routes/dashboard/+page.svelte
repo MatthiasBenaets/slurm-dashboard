@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 	import { Cpu, MemoryStick, Activity, LogOut } from '@lucide/svelte';
-	import { convertTres } from '$lib/utils';
+	import DateRange from '$lib/components/dashboard/daterange.svelte';
+	import { convertTres, pastTime, currentTime } from '$lib/utils';
 	import type { Node, Partition, NodeState, Tres } from '$lib/types';
 
 	let { data } = $props();
@@ -30,8 +31,17 @@
 	);
 	let memUsage = $derived(totalMem > 0 ? totalMemUsed / totalMem : 0);
 	let cpuUsage = $derived(totalCpu > 0 ? totalCpuUsed / totalCpu : 0);
+	let range_start = $state(pastTime);
+	let range_end = $state(currentTime);
 	let dashState: 'NODES' | 'JOBS' | 'HISTORY' = $state('NODES');
 	let error: string = $state('');
+
+	// range date picker update handler
+	function handleDateChange(start: number, end: number) {
+		range_start = start;
+		range_end = end;
+		updateData();
+	}
 
 	// count states of all nodes
 	const stateCounts: NodeState = $derived(
@@ -58,7 +68,16 @@
 	// update live cluster data
 	async function updateData() {
 		try {
-			const res = await fetch('/api/slurm');
+			const res = await fetch('/api/slurm', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					start_time: range_start,
+					end_time: range_end
+				})
+			});
 			const updatedData = await res.json();
 			if (updatedData.slurm) {
 				slurm = updatedData.slurm;
@@ -187,34 +206,41 @@
 		</div>
 
 		<div class="pt-4">
-			<div class="flex flex-row justify-center pb-4 md:justify-start">
-				<button
-					onclick={() => {
-						dashState = 'NODES';
-					}}
-					class="cursor-pointer px-5 text-xl hover:scale-110 hover:text-neutral-50
+			<div class="flex flex-col items-center justify-center pb-4 md:flex-row md:justify-between">
+				<div class="flex flex-row">
+					<button
+						onclick={() => {
+							dashState = 'NODES';
+						}}
+						class="cursor-pointer px-5 text-xl hover:scale-110 hover:text-neutral-50
         {dashState === 'NODES' ? 'scale-110 text-neutral-100' : ''}"
-				>
-					Nodes
-				</button>
-				<button
-					onclick={() => {
-						dashState = 'JOBS';
-					}}
-					class="cursor-pointer px-5 text-xl hover:scale-110 hover:text-neutral-50
+					>
+						Nodes
+					</button>
+					<button
+						onclick={() => {
+							dashState = 'JOBS';
+						}}
+						class="cursor-pointer px-5 text-xl hover:scale-110 hover:text-neutral-50
         {dashState === 'JOBS' ? 'scale-110 text-neutral-100' : ''}"
-				>
-					Jobs
-				</button>
-				<button
-					onclick={() => {
-						dashState = 'HISTORY';
-					}}
-					class="cursor-pointer px-5 text-xl hover:scale-110 hover:text-neutral-50
+					>
+						Jobs
+					</button>
+					<button
+						onclick={() => {
+							dashState = 'HISTORY';
+						}}
+						class="cursor-pointer px-5 text-xl hover:scale-110 hover:text-neutral-50
         {dashState === 'HISTORY' ? 'scale-110 text-neutral-100' : ''}"
-				>
-					History
-				</button>
+					>
+						History
+					</button>
+				</div>
+				<div>
+					{#if dashState === 'HISTORY'}
+						<DateRange onDateChange={handleDateChange} />
+					{/if}
+				</div>
 			</div>
 			{#if nodes && dashState === 'NODES'}
 				<div in:fade={{ duration: 100, delay: 110 }} class="flex w-full flex-wrap justify-center">
