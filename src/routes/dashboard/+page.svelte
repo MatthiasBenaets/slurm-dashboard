@@ -2,6 +2,7 @@
 	import { fade } from 'svelte/transition';
 	import { Cpu, MemoryStick, Activity, LogOut } from '@lucide/svelte';
 	import DateRange from '$lib/components/dashboard/daterange.svelte';
+	import Pagination from '$lib/components/dashboard/pagination.svelte';
 	import { convertTres, pastTime, currentTime } from '$lib/utils';
 	import type { Node, Partition, NodeState, Tres } from '$lib/types';
 
@@ -33,11 +34,15 @@
 	let cpuUsage = $derived(totalCpu > 0 ? totalCpuUsed / totalCpu : 0);
 	let range_start = $state(pastTime);
 	let range_end = $state(currentTime);
+	let perPage = 10;
+	let historyPage = $state(1);
+	let jobsPage = $state(1);
 	let dashState: 'NODES' | 'JOBS' | 'HISTORY' = $state('NODES');
 	let error: string = $state('');
 
 	// range date picker update handler
 	function handleDateChange(start: number, end: number) {
+		historyPage = 1;
 		range_start = start;
 		range_end = end;
 		updateData();
@@ -81,6 +86,9 @@
 			const updatedData = await res.json();
 			if (updatedData.slurm) {
 				slurm = updatedData.slurm;
+			}
+			if (jobsPage > Math.ceil(slurm.sjobs.jobs.length / perPage)) {
+				jobsPage = Math.ceil(slurm.sjobs.jobs.length / perPage);
 			}
 		} catch (e) {
 			error = (e as Error).message;
@@ -293,7 +301,10 @@
 							</tr>
 						</thead>
 						<tbody>
-							{#each slurm.sjobs.jobs.slice().reverse() as job (job.job_id)}
+							{#each slurm.sjobs.jobs
+								.slice()
+								.reverse()
+								.slice((jobsPage - 1) * perPage, jobsPage * perPage) as job (job.job_id)}
 								<tr>
 									<td>{job.job_id}</td>
 									<td>{job.job_state[0]}</td>
@@ -306,6 +317,9 @@
 						</tbody>
 					</table>
 				</div>
+				{#if slurm.sjobs.jobs.length > perPage}
+					<Pagination count={slurm.sjobs.jobs.length} {perPage} bind:page={jobsPage} />
+				{/if}
 			{/if}
 
 			{#if slurm.dbjobs.jobs && dashState === 'HISTORY'}
@@ -325,7 +339,10 @@
 							</tr>
 						</thead>
 						<tbody>
-							{#each slurm.dbjobs.jobs.slice().reverse() as job (job.job_id)}
+							{#each slurm.dbjobs.jobs
+								.slice()
+								.reverse()
+								.slice((historyPage - 1) * perPage, historyPage * perPage) as job (job.job_id)}
 								<tr>
 									<td>{job.job_id}</td>
 									<td>{job.state.current[0]}</td>
@@ -335,8 +352,8 @@
 									</td>
 									<td>
 										{(
-											(job.tres.allocated as Tres[]).find((item) => item.type === 'mem')?.count ||
-											0 / 1000
+											((job.tres.allocated as Tres[]).find((item) => item.type === 'mem')?.count ||
+												0) / 1000
 										).toFixed(0)}
 									</td>
 									<td>
@@ -347,6 +364,7 @@
 						</tbody>
 					</table>
 				</div>
+				<Pagination count={slurm.dbjobs.jobs.length} {perPage} bind:page={historyPage} />
 			{/if}
 		</div>
 	</div>
