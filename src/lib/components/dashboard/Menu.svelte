@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { DateRange } from '$lib/components/general';
-	let { dashState = $bindable(), handleDateChange } = $props();
+	let { dashState = $bindable(), handleDateChange, filter = $bindable() } = $props();
 </script>
 
 <div class="flex flex-col items-center justify-center pb-4 md:flex-row md:justify-between">
@@ -33,7 +33,15 @@
 			History
 		</button>
 	</div>
-	<div>
+	<div class="flex flex-row">
+		{#if dashState === 'JOBS' || dashState === 'HISTORY'}
+			<input
+				type="text"
+				bind:value={filter}
+				placeholder="Filter by User or Jobs ID"
+				class="mr-4 rounded-md border border-neutral-700 px-2 focus:border-neutral-500 focus:outline-none"
+			/>
+		{/if}
 		{#if dashState === 'HISTORY'}
 			<DateRange onDateChange={handleDateChange} />
 		{/if}

@@ -3,7 +3,7 @@
 	import { LogOut } from '@lucide/svelte';
 	import { Nodes, Jobs, History, Menu, Summary } from '$lib/components/dashboard';
 	import { pastTime, currentTime } from '$lib/utils';
-	import type { Node, Partition } from '$lib/types';
+	import type { Node, Partition, SJob, DBJob } from '$lib/types';
 
 	let { data } = $props();
 	let slurm = $state(data.slurm);
@@ -16,6 +16,24 @@
 	let jobsPage = $state(1);
 	let dashState: 'NODES' | 'JOBS' | 'HISTORY' = $state('NODES');
 	let error: string = $state('');
+
+	// filter by username or job id, bound to menu input field
+	let filter = $state('');
+	let filteredSjobs = $derived(
+		filter
+			? (slurm?.sjobs?.jobs?.filter(
+					(job: SJob) => job.user_name.includes(filter) || job.job_id.toString().includes(filter)
+				) ?? [])
+			: (slurm?.sjobs?.jobs ?? [])
+	);
+
+	let filteredDbjobs = $derived(
+		filter
+			? (slurm?.dbjobs?.jobs?.filter(
+					(job: DBJob) => job.user.includes(filter) || job.job_id.toString().includes(filter)
+				) ?? [])
+			: (slurm?.dbjobs?.jobs ?? [])
+	);
 
 	// range date picker update handler
 	function handleDateChange(start: number, end: number) {
@@ -95,18 +113,18 @@
 		</div>
 
 		<div class="pt-4">
-			<Menu bind:dashState {handleDateChange} />
+			<Menu bind:dashState {handleDateChange} bind:filter />
 
 			{#if nodes && dashState === 'NODES'}
 				<Nodes {nodes} />
 			{/if}
 
 			{#if slurm.sjobs.jobs && dashState === 'JOBS'}
-				<Jobs jobs={slurm.sjobs.jobs} {jobsPerPage} {jobsPage} />
+				<Jobs jobs={filteredSjobs} {jobsPerPage} {jobsPage} />
 			{/if}
 
 			{#if slurm.dbjobs.jobs && dashState === 'HISTORY'}
-				<History jobs={slurm.dbjobs.jobs} {jobsPerPage} {historyPage} />
+				<History jobs={filteredDbjobs} {jobsPerPage} {historyPage} />
 			{/if}
 		</div>
 	</div>

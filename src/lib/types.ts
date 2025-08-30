@@ -48,3 +48,74 @@ export interface Partition {
 	tres: { billing_weights: string; configured: string };
 	lenght: number;
 }
+
+export interface SJob {
+	batch_host: string;
+	cluster: string;
+	command: string;
+	group_id: number;
+	group_name: string;
+	job_id: number;
+	job_state: string[];
+	name: string;
+	start_time: {
+		number: number;
+	};
+	tres_req_str: string;
+	tres_alloc_str: string;
+	user_id: number;
+	user_name: string;
+	current_working_directory: string;
+}
+
+export interface DBJob {
+	cluster: string;
+	time: {
+		elapsed: number;
+		eligible: number;
+		end: number;
+		start: number;
+		submission: number;
+		suspended: number;
+	};
+	group: string;
+	job_id: number;
+	name: number;
+	nodes: string;
+	partition: string;
+	hold: boolean;
+	priority: {
+		set: boolean;
+		infinite: boolean;
+		number: number;
+	};
+	required: {
+		CPUs: number;
+		memory_per_cpu: {
+			set: boolean;
+			infinite: boolean;
+			number: number;
+		};
+		memory_per_node: {
+			set: boolean;
+			infinite: boolean;
+			number: number;
+		};
+	};
+	kill_request_user: string;
+	state: {
+		current: string[];
+	};
+	submit_line: string;
+	tres: {
+		allocated: [];
+		requested: {
+			type: string;
+			name: string;
+			id: number;
+			count: number;
+		}[];
+	};
+	user: string;
+	working_directory: string;
+}
