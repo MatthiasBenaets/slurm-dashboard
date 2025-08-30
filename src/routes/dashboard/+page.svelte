@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import { LogOut } from '@lucide/svelte';
 	import { Nodes, Jobs, History, Menu, Summary } from '$lib/components/dashboard';
 	import { pastTime, currentTime } from '$lib/utils';
@@ -14,8 +15,8 @@
 	let jobsPerPage = 15;
 	let historyPage = $state(1);
 	let jobsPage = $state(1);
-	let dashState: 'NODES' | 'JOBS' | 'HISTORY' = $state('NODES');
 	let error: string = $state('');
+	const params = $derived(page.url.searchParams);
 
 	// filter by username or job id, bound to menu input field
 	let filter = $state('');
@@ -113,17 +114,17 @@
 		</div>
 
 		<div class="pt-4">
-			<Menu bind:dashState {handleDateChange} bind:filter />
+			<Menu menu={params.get('menu')} {handleDateChange} bind:filter />
 
-			{#if nodes && dashState === 'NODES'}
+			{#if slurm.nodes.nodes && (params.get('menu') === 'nodes' || params.get('menu') === undefined || (params.get('menu') !== 'jobs' && params.get('menu') !== 'history'))}
 				<Nodes {nodes} />
 			{/if}
 
-			{#if slurm.sjobs.jobs && dashState === 'JOBS'}
+			{#if slurm.sjobs.jobs && params.get('menu') === 'jobs'}
 				<Jobs jobs={filteredSjobs} {jobsPerPage} {jobsPage} />
 			{/if}
 
-			{#if slurm.dbjobs.jobs && dashState === 'HISTORY'}
+			{#if slurm.dbjobs.jobs && params.get('menu') === 'history'}
 				<History jobs={filteredDbjobs} {jobsPerPage} {historyPage} />
 			{/if}
 		</div>
